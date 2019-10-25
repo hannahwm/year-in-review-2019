@@ -1,0 +1,57 @@
+//variables
+@import "variables";
+@import "font-mixin";
+
+//modules
+@import "story";
+
+
+body {
+  background-color: #fff;
+  padding-bottom: 1000px;
+  margin: 0;
+}
+
+.yir-title {
+  font-family: $primary-title;
+  text-align: center;
+  font-size: 80px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
+
+.yir-paragraph {
+  font-family: $body-font;
+  margin: 0 auto 20px;
+  max-width: 750px;
+}
+
+.story-categories {
+  margin: 50px auto 0;
+  max-width: 1200px;
+
+  li {
+    position: relative;
+    display: inline-block;
+    padding-left: 17px;
+    padding-right: 15px;
+    font-family: $secondary-title;
+    font-size: 16px;
+    text-transform: uppercase;
+    border-bottom: 5px solid transparent;
+
+    &:hover {
+      border-bottom: 5px solid rgba(0,0,0,0.1);
+    }
+  }
+
+  .bullet {
+    position: absolute;
+    top: 3px;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    background-color: #000;
+    border-radius: 10px;
+  }
+}
