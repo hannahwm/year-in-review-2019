@@ -43,7 +43,7 @@ var $ = jQuery;
           if (self.options.isPaused === false) {
             self.cycleStories();
           }
-        }, 8000);
+        }, 11000);
 
         var grid = document.getElementById("story-grid");
 
@@ -111,10 +111,32 @@ var $ = jQuery;
               self.$categoryList.append("<li class='" + category + "'><span class='bullet'></span>" + category + "</li>");
             }
 
-            var storyEl = "<div class='story-frame'><div id='story-" + id + "' class='story unclickable' data-cat='" + data[i].category + "'><div class='story-img'><img src='" + data[i].image + "' /></div><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2><p class='story-teaser'>" + data[i].teaser + "</div></div>";
+            var storyEl = "<div class='story-frame'><div class='story-inner'><div id='story-" + id + "' class='story unclickable' data-cat='" + data[i].category + "'><div class='story-img'><img src='" + data[i].image + "' /></div><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2><p class='story-teaser'>" + data[i].teaser + "</p></div></div></div>";
 
             self.$grid.append(storyEl);
           }
+
+          /********* create array of random ids ************/
+          for (var a=[],i=0;i<(data.length * 0.66);++i) {
+            a[i]=i;
+          }
+
+          // http://stackoverflow.com/questions/962802#962890
+          function shuffle(array) {
+            var tmp, current, top = array.length;
+            if (top) while(--top) {
+              current = Math.floor(Math.random() * (top + 1));
+              tmp = array[current];
+              array[current] = array[top];
+              array[top] = tmp;
+            }
+            return array;
+          }
+
+          idArray = shuffle(a);
+
+          console.log(idArray);
+          /********* create array of random ids ************/
 
           // for (var i = 0; i < categoryArray.length; i++) {
           //   var color = self.getRandomColor();
@@ -124,6 +146,11 @@ var $ = jQuery;
 
           $(".story").each( function() {
             var curStory = $(this);
+            var parent = curStory.closest(".story-frame");
+            var storyId = curStory.attr("id");
+            var idArr = storyId.split("-");
+            var curId = idArr[1];
+            var actualId = parseInt(curId);
             //add color border based on category
             var storyCat = curStory.attr("data-cat");
             categoryListItem = self.$categoryList.find("li");
@@ -139,6 +166,20 @@ var $ = jQuery;
                   $(this).find(".bullet").css("background-color", colorArray[i]);
                 }
               })
+            }
+
+            //randomly make some stories taller (by adding class names)
+            for (var o = 0; o < idArray.length; o++) {
+              var middleOfArray = idArray.length/2;
+              var id = idArray[o];
+
+              if (actualId === id) {
+                if (o < middleOfArray) {
+                  curStory.closest(".story-inner").addClass("height2");
+                } else {
+                  curStory.closest(".story-inner").addClass("height3");
+                }
+              }
             }
 
             //highlight story on click
@@ -170,7 +211,7 @@ var $ = jQuery;
             });
 
             //grey out all sibling with a different category when hovering over story
-            curStory.hover( function() {
+            parent.hover( function() {
 
               self.options.isPaused = true;
               var highlightOpen = false;
@@ -221,11 +262,20 @@ var $ = jQuery;
                 story.addClass("inactive");
               }
             });
+
+            //make sure siblings are hidden first
+            $(".category-intro li").removeClass("visible");
+            $(".category-intro li").each( function() {
+              var introCat = $(this).attr("id");
+
+              if (category === introCat) {
+                $(this).addClass("visible");
+              }
+            })
           }, function() {
             $(".story").removeClass("inactive");
             self.options.isPaused = false;
           });
-
 
       });
 
@@ -280,7 +330,7 @@ var $ = jQuery;
           highlightStory.addClass("unclickable");
         }, 500);
 
-      }, 5000);
+      }, 8000);
 
     },
     animateHighlightStory: function(highlightStory) {
@@ -294,24 +344,45 @@ var $ = jQuery;
       var horizontalCenter = $(window).width() /2;
       var verticalCenter = $(window).height() / 2;
 
-      //calculate the difference between element's position and the center of the page
-      var topDifference;
-      if (verticalCenter > storyTop) {
-        var calcMiddle = verticalCenter - storyTop;
-        topDifference = calcMiddle - $(highlightStory).height()/2;
+      var storyWidth;
+
+      if ($(window).width() < 768) {
+        storyWidth = $(window).width() * 0.4;
+      } else if ($(window).width() < 1200) {
+        storyWidth = $(window).width() * 0.35;
       } else {
-        var calcMiddle = -( (storyTop - verticalCenter) + $(highlightStory).height()/2);
-        topDifference = calcMiddle;
+        storyWidth = 300;
       }
 
+      var storyHeight;
+
+      if ($(window).width() < 768) {
+        storyHeight = $(window).width() * 0.3;
+      } else if ($(window).width() < 1200) {
+        storyHeight = $(window).width() * 0.25;
+      } else {
+        storyHeight = 200;
+      }
+
+      //calculate the difference between element's position and the center of the page
       var leftDifference;
       if (horizontalCenter > storyLeft) {
         var calcMiddle = horizontalCenter - storyLeft;
-        leftDifference = calcMiddle - $(highlightStory).width()/2;
+        leftDifference = calcMiddle - storyWidth;
       } else {
-        var calcMiddle = -( (storyLeft - horizontalCenter) + $(highlightStory).width()/2);
+        var calcMiddle = -( (storyLeft - horizontalCenter) + storyWidth);
         leftDifference = calcMiddle;
       }
+
+      var topDifference;
+      if (verticalCenter > storyTop) {
+        var calcMiddle = verticalCenter - storyTop;
+        topDifference = calcMiddle - storyHeight;
+      } else {
+        var calcMiddle = -( (storyTop - verticalCenter) + storyHeight);
+        topDifference = calcMiddle;
+      }
+
       //************ Calculate distance to move ****************//
 
 
@@ -329,5 +400,17 @@ var $ = jQuery;
 (function init () {
   $(document).ready(function() {
     $(".yir-wrapper").populateFromJSON();
+
+    setTimeout(function() {
+      var $grid = $('.story-grid').imagesLoaded( function() {
+
+        $grid.masonry({
+          // options
+          itemSelector: '.story-frame',
+          columnWidth: '.grid-sizer',
+          percentPosition: true
+        });
+      })
+    }, 500);
   });
 })();

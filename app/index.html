@@ -7,8 +7,8 @@
 <link rel="stylesheet" href="css/styles.min.css">
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.1/ScrollMagic.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.6/plugins/debug.addIndicators.min.js"></script>
+<script src="js/library/masonry.pkgd.min.js"></script>
+<script src="js/library/imagesloaded.pkgd.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 </head>
 
@@ -16,10 +16,22 @@
 
   <div class="yir-wrapper">
     <h1 class="yir-title">2019 in Review</h1>
-    <p class="yir-paragraph">Nunc id dictum lacus. Aenean ipsum enim, luctus quis dictum a, varius laoreet nunc. Etiam dui erat, imperdiet sit amet euismod ac, feugiat in neque. Integer eu mauris neque. Aliquam erat volutpat. Cras iaculis magna in dui imperdiet placerat vitae et nunc.</p>
+    <p class="yir-paragraph">It was a year filled with proud moments. Researchers uncovering the secrets of some of the world’s most interesting phenomena. Great headlines in the press about the university and our people. A historic win on the ice. These are some of the successes we are celebrating as 2019 comes to a close.</p>
+    <ul class="category-intro">
+      <li id="Generic" class="visible">Generic intro</li>
+      <li id="Action">action intro</li>
+      <li id="Adventure">adventure intro</li>
+      <li id="Drama">drama intro</li>
+      <li id="Comedy">comedy intro</li>
+      <li id="Animation">animation intro</li>
+      <li id="Horror">horror intro</li>
+      <li id="Crime">crime intro</li>
+    </ul>
     <ul class="story-categories">
     </ul>
-    <div id="story-grid" class="story-grid"></div>
+    <div id="story-grid" class="story-grid">
+      <div class="grid-sizer"></div>
+    </div>
   </div>
 
   <!--build:js js/main.min.js -->

@@ -8,7 +8,6 @@
 
 body {
   background-color: #fff;
-  padding-bottom: 1000px;
   margin: 0;
 }
 
@@ -53,5 +52,25 @@ body {
     height: 12px;
     background-color: #000;
     border-radius: 10px;
+  }
+}
+
+.category-intro {
+  position: relative;
+  font-family: $body-font;
+  list-style-type: none;
+  max-width: 750px;
+  margin: 40px auto 100px;
+  padding: 0;
+
+  li {
+    position: absolute;
+    opacity: 0;
+    margin: 0;
+    transition: all 1s ease-in-out;
+
+    &.visible {
+      opacity: 1;
+    }
   }
 }
