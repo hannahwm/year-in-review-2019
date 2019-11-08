@@ -1,0 +1,128 @@
+.category {
+  position: relative;
+  font-family: $body-font;
+  list-style-type: none;
+  max-width: 750px;
+  height: 100vw;
+  margin: 40px auto;
+  padding: 0;
+
+  @media screen and (min-width: 750px) {
+    height: 700px;
+  }
+
+  li {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+    margin: 0;
+    transition: all 1s ease-in-out;
+
+    &.visible {
+      z-index: 2;
+      opacity: 1;
+    }
+  }
+}
+
+.category-title {
+  margin: 0 0 20px;
+  font-family: $primary-title;
+  font-size: 26px;
+
+  @media screen and (min-width: 600px) {
+    font-size: 40px;
+  }
+
+  @media screen and (min-width: 1024px) {
+    font-size: 50px;
+  }
+}
+
+.category-intro {
+  margin: 0 auto 40px;
+}
+
+.category-featTitle {
+  position: absolute;
+  bottom: 0;
+  margin: 0;
+  padding: 1vw;
+  font-family: $primary-title;
+  line-height: 1em;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 26px;
+  background-color: rgba(0,0,0,0.8);
+
+  @media screen and (min-width: 600px) {
+    font-size: 40px;
+  }
+
+  @media screen and (min-width: 1024px) {
+    font-size: 50px;
+  }
+
+  a {
+      color: inherit;
+      text-decoration: none;
+  }
+}
+
+.category-featImg {
+  position: relative;
+  margin: 0 0 40px;
+
+  @media screen and (min-width: 750px) {
+    width: 750px;
+    height: 500px;
+  }
+
+  img {
+    max-width: 100%;
+  }
+}
+
+.category-prev,
+.category-next {
+  position: absolute;
+  top: 100px;
+  font-family: $primary-title;
+  font-size: 18px;
+  padding: 10px;
+  background-color: rgba(0,0,0,0.8);
+  border: 0;
+  color: rgba(255,255,255,0.8);
+  outline: none;
+  cursor: pointer;
+}
+
+.category-prev {
+  left: 10px;
+  padding-left: 20px;
+  &:before {
+    position: absolute;
+    top: calc(50% - 8px);
+    left: 5px;
+    width: 10px;
+    height: 16px;
+    content: "";
+    background: url("/interactive/2019/12/year-in-review-2019/images/arrow-left.svg") no-repeat center;
+    background-size: contain;
+  }
+}
+
+.category-next {
+  right: 10px;
+  padding-right: 20px;
+  &:before {
+    position: absolute;
+    top: calc(50% - 8px);
+    right: 5px;
+    width: 10px;
+    height: 16px;
+    content: "";
+    background: url("/interactive/2019/12/year-in-review-2019/images/arrow-right.svg") no-repeat center;
+    background-size: contain;
+  }
+}

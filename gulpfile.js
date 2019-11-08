@@ -78,7 +78,7 @@ Note: Remember to only upload the /images folder to your project folder in Wordp
 gulp.task('images', function(){
   return gulp.src('app/images/**/*.+(png|jpg|jpeg|gif|svg)')
   .pipe(cache(imagemin()))
-  .pipe(gulp.dest('dist/interactive/2018/10/bubble/images'))
+  .pipe(gulp.dest('dist/interactive/2019/12/year-in-review-2019/images'))
   .pipe(browserSync.reload({
     stream: true
   }))

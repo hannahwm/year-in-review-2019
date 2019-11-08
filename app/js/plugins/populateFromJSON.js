@@ -12,8 +12,10 @@ var $ = jQuery;
 
   $.fn.populateFromJSON.options = {
       grid: ".story-grid",
+      categoryItem: ".category li",
       categoryList: ".story-categories",
-      isPaused: false,
+      isPaused: true,
+      isInit: false,
       userSelection: false,
   };
 
@@ -30,6 +32,7 @@ var $ = jQuery;
         var self = this;
 
         self.$grid = self.$container.find(self.options.grid);
+        self.$categoryItem = self.$container.find(self.options.categoryItem);
         self.$categoryList = self.$container.find(self.options.categoryList);
     },
     bindEvents: function() {
@@ -37,13 +40,13 @@ var $ = jQuery;
 
       $(document).ready( function() {
         self.populateFields();
+        // self.categorySlider();
 
         setInterval(function() {
-          console.log("isPaused = " + self.options.isPaused);
-          if (self.options.isPaused === false) {
+          if (self.options.isPaused === false && self.options.isInit === true) {
             self.cycleStories();
           }
-        }, 11000);
+        }, 14000);
 
         var grid = document.getElementById("story-grid");
 
@@ -66,6 +69,7 @@ var $ = jQuery;
             });//each
 
             setTimeout(function() {
+              $(".story").removeClass("overlay");
               $(".story").not(".unclickable").addClass("unclickable");
               self.options.isPaused = false;
             }, 500);
@@ -73,6 +77,37 @@ var $ = jQuery;
         });//document.addEventListener
 
       });
+
+      //make the categories fixed on scroll
+      window.onscroll = function() { makeSticky(), initPopup() };
+
+      var catList = $(self.options.categoryList);
+      var sticky = catList.offset().top;
+      var widthToDetract;
+
+      if ($(window).width() < 1200) {
+        widthToDetract = $(window).width() / 4;
+      } else {
+        widthToDetract = 300;
+      }
+
+      var startPopup = catList.offset().top - widthToDetract;
+
+      function makeSticky() {
+        if (window.pageYOffset > sticky) {
+          catList.addClass("fixed");
+        } else {
+          catList.removeClass("fixed");
+        }
+      }
+
+      function initPopup() {
+        if (window.pageYOffset > startPopup) {
+          self.options.isInit = true;
+        } else {
+          self.options.isInit = false;
+        }
+      }
 
     },
     loadJSON: function(callback) {
@@ -102,47 +137,26 @@ var $ = jQuery;
           var colorArray = [];
 
           for (var i = 0; i < data.length; i++) {
-            var category = data[i].category;
+            var fullCategory = data[i].category;
+            var splitCat = fullCategory.split(" ");
+            var intCategory = splitCat[0];
+            var category = intCategory.replace(/,/g, '');
             var id = i+1;
 
             //push categories to array to figure out how many there are
             if (!categoryArray.includes(category)) {
               categoryArray.push(category);
-              self.$categoryList.append("<li class='" + category + "'><span class='bullet'></span>" + category + "</li>");
+              self.$categoryList.append("<li class='" + category + "'><span class='bullet'></span>" + fullCategory + "</li>");
             }
 
-            var storyEl = "<div class='story-frame'><div class='story-inner'><div id='story-" + id + "' class='story unclickable' data-cat='" + data[i].category + "'><div class='story-img'><img src='" + data[i].image + "' /></div><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2><p class='story-teaser'>" + data[i].teaser + "</p></div></div></div>";
+            var storyEl = "<div class='story-frame'><div class='story-inner'><div id='story-" + id + "' class='story unclickable' data-cat='" + category + "'><div class='story-img'><img src='" + data[i].image + "' /></div><div class='story-content'><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2></div></div></div></div>";
+
+            // <p class='story-teaser'>" + data[i].teaser + "</p>
 
             self.$grid.append(storyEl);
           }
 
-          /********* create array of random ids ************/
-          for (var a=[],i=0;i<(data.length * 0.66);++i) {
-            a[i]=i;
-          }
-
-          // http://stackoverflow.com/questions/962802#962890
-          function shuffle(array) {
-            var tmp, current, top = array.length;
-            if (top) while(--top) {
-              current = Math.floor(Math.random() * (top + 1));
-              tmp = array[current];
-              array[current] = array[top];
-              array[top] = tmp;
-            }
-            return array;
-          }
-
-          idArray = shuffle(a);
-
-          console.log(idArray);
-          /********* create array of random ids ************/
-
-          // for (var i = 0; i < categoryArray.length; i++) {
-          //   var color = self.getRandomColor();
-          //   colorArray.push(color);
-          // }
-          colorArray = ["#e84040","#a00000","#3c608d","#6894cb","#e2b64c","#ef945d","#69b993","#268270"];
+          colorArray = ["#e84040","#a00000","#3c608d","#6894cb","#e2b64c","#ef945d","#69b993","#268270", "#962890"];
 
           $(".story").each( function() {
             var curStory = $(this);
@@ -151,7 +165,8 @@ var $ = jQuery;
             var idArr = storyId.split("-");
             var curId = idArr[1];
             var actualId = parseInt(curId);
-            //add color border based on category
+
+            /*******  add color border based on category *********/
             var storyCat = curStory.attr("data-cat");
             categoryListItem = self.$categoryList.find("li");
 
@@ -161,26 +176,13 @@ var $ = jQuery;
               }
 
               categoryListItem.each( function() {
-                var text = $(this).text();
-                if ( text === categoryArray[i]) {
+                var listId = $(this).attr("class");
+                if ( listId === categoryArray[i]) {
                   $(this).find(".bullet").css("background-color", colorArray[i]);
                 }
               })
             }
-
-            //randomly make some stories taller (by adding class names)
-            for (var o = 0; o < idArray.length; o++) {
-              var middleOfArray = idArray.length/2;
-              var id = idArray[o];
-
-              if (actualId === id) {
-                if (o < middleOfArray) {
-                  curStory.closest(".story-inner").addClass("height2");
-                } else {
-                  curStory.closest(".story-inner").addClass("height3");
-                }
-              }
-            }
+            /*******  end: add color border based on category *********/
 
             //highlight story on click
             curStory.click( function(e) {
@@ -190,9 +192,10 @@ var $ = jQuery;
               if ($(this).hasClass("unclickable")) {
                 e.preventDefault();
 
-                //close any other highlighted story
+                //close any other highlighted story and add overlay
                 $(".story").not(curStory).each( function() {
                   $(this).removeClass("highlighted");
+                  $(this).addClass("overlay");
                   $(this).animate({
                     top: 0,
                     left: 0
@@ -206,6 +209,7 @@ var $ = jQuery;
                 //highlight the clicked story
                 $(this).addClass("highlighted");
                 $(this).removeClass("unclickable");
+                $(this).removeClass("overlay");
                 self.animateHighlightStory($(this));
               }
             });
@@ -229,11 +233,31 @@ var $ = jQuery;
                   var story = $(this);
                   var siblingCat = $(this).attr("data-cat");
 
+                  //add inactive class that greys it out
                   if (siblingCat !== storyCat) {
                     story.addClass("inactive");
                   }
                 });
+
+                /***** also highlight the category and show respective intro text *****/
+                categoryListItem.each( function() {
+                  var listId = $(this).attr("class");
+                  if ( listId === storyCat) {
+                    $(this).addClass("active");
+                  }
+                })
+
+                $(".category li").removeClass("visible");
+                $(".category li").each( function() {
+                  var introCat = $(this).attr("id");
+
+                  if (storyCat === introCat) {
+                    $(this).addClass("visible");
+                  }
+                })
+                /***** end:also highlight the category and show respective intro text *****/
               }
+
             }, function() {
               //if the user has clicked the story, ignore the next steps
               if (self.options.userSelection === true) {
@@ -241,6 +265,7 @@ var $ = jQuery;
                 return;
               }
 
+              categoryListItem.removeClass("active");
               $(".story").removeClass("inactive");
               self.options.isPaused = false;
               highlightOpen = false;
@@ -251,21 +276,34 @@ var $ = jQuery;
           //Highlight all category items when hovering over category
           categoryListItem.hover( function() {
             self.options.isPaused = true;
+            var highlightOpen = false;
+            var stories = $(".story");
+
+            for (var i=0; i < stories.length; i++) {
+              var current = stories[i];
+              if ( $(current).hasClass("highlighted") ) {
+                highlightOpen = true;
+              }
+            }
+
             var category = $(this).attr("class");
 
 
-            $(".story").each( function() {
-              var storyCat = $(this).attr("data-cat");
-              var story = $(this);
+            if (highlightOpen === false) {
+              $(".story").each( function() {
+                var storyCat = $(this).attr("data-cat");
+                var story = $(this);
 
-              if (category !== storyCat) {
-                story.addClass("inactive");
-              }
-            });
+                if (category !== storyCat) {
+                  story.addClass("inactive");
+                }
+              });
+            }
 
+            //display intro text for the current category
             //make sure siblings are hidden first
-            $(".category-intro li").removeClass("visible");
-            $(".category-intro li").each( function() {
+            $(".category li").removeClass("visible");
+            $(".category li").each( function() {
               var introCat = $(this).attr("id");
 
               if (category === introCat) {
@@ -310,6 +348,7 @@ var $ = jQuery;
       var highlightStory = $(id);
 
       stories.removeClass("highlighted");
+      stories.addClass("overlay");
 
       highlightStory.addClass("highlighted");
       highlightStory.removeClass("unclickable");
@@ -317,7 +356,7 @@ var $ = jQuery;
       self.animateHighlightStory(highlightStory);
 
       setTimeout(function() {
-        if (self.options.isPaused === true) {
+        if (self.options.isPaused === true || self.options.isInit === false) {
           return;
         }
         highlightStory.animate({
@@ -328,6 +367,7 @@ var $ = jQuery;
         stories.removeClass("highlighted");
         setTimeout(function() {
           highlightStory.addClass("unclickable");
+          stories.removeClass("overlay");
         }, 500);
 
       }, 8000);

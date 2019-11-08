@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="23px" height="38px" viewBox="0 0 23 38" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 49.3 (51167) - http://www.bohemiancoding.com/sketch -->
+    <title>arrow-left</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" opacity="0.798629982">
+        <g id="Mobile" transform="translate(-30.000000, -445.000000)" fill="#FFFFFF">
+            <g id="arrow-left" transform="translate(30.000000, 445.000000)">
+                <path d="M26.4202896,31.9107954 L26.4202896,10.7621806 L5.47502692,10.7621806 L5.47502692,5.47502692 L31.9107954,5.47502692 L31.9107954,31.9107954 L26.4202896,31.9107954 Z" transform="translate(18.692911, 18.692911) scale(-1, 1) rotate(45.000000) translate(-18.692911, -18.692911) "></path>
+            </g>
+        </g>
+    </g>
+</svg>
