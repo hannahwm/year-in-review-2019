@@ -40,21 +40,29 @@ var $ = jQuery;
       self.$categoryItem.each( function() {
         var prev;
         var next;
+        var prevCat;
+        var nextCat;
+
         if ($(this).is(":first-child")) {
           prev = $(".category li:last-child");
+          prevCat = prev.children(".category-title").text();
+        } else if ($(this).is(":nth-child(2)")) {
+          prev = $(this).prev();
+          prevCat = "Explore";
         } else {
           prev = $(this).prev();
+          prevCat = prev.children(".category-title").text();
         }
 
         if ($(this).is(":last-child")) {
           next = $(".category li:first-child");
+          nextCat = "Explore";
         } else {
           next = $(this).next();
+          nextCat = next.children(".category-title").text();
         }
 
-        var prevCat = prev.children(".category-title").text();
         var prevId = prev.attr("id");
-        var nextCat = next.children(".category-title").text();
         var nextId = next.attr("id");
 
         $(this).append("<button id='" + prevId + "' class='category-prev'>" + prevCat + "</button><button id='" + nextId + "' class='category-next'>" + nextCat + "</button>")
@@ -63,26 +71,35 @@ var $ = jQuery;
       var prevButton = $(".category-prev");
       var nextButton = $(".category-next");
 
+      var contentHeight;
       prevButton.click( function() {
         var btnId = $(this).attr("id");
+        var curSlide;
         self.$categoryItem.removeClass("visible");
         self.$categoryItem.each( function() {
           var introCat = $(this).attr("id");
           if (btnId === introCat) {
             $(this).addClass("visible");
+            curSlide = $(this);
           }
         })
+        // contentHeight = curSlide.height();
+        // $(".category").css("height", contentHeight);
       });
 
       nextButton.click( function() {
         var btnId = $(this).attr("id");
+        var curSlide;
         self.$categoryItem.removeClass("visible");
         self.$categoryItem.each( function() {
           var introCat = $(this).attr("id");
           if (btnId === introCat) {
             $(this).addClass("visible");
+            curSlide = $(this);
           }
         })
+        // contentHeight = curSlide.height();
+        // $(".category").css("height", contentHeight);
       });
     },
   };

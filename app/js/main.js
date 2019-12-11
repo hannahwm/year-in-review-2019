@@ -40,21 +40,29 @@ var $ = jQuery;
       self.$categoryItem.each( function() {
         var prev;
         var next;
+        var prevCat;
+        var nextCat;
+
         if ($(this).is(":first-child")) {
           prev = $(".category li:last-child");
+          prevCat = prev.children(".category-title").text();
+        } else if ($(this).is(":nth-child(2)")) {
+          prev = $(this).prev();
+          prevCat = "Explore";
         } else {
           prev = $(this).prev();
+          prevCat = prev.children(".category-title").text();
         }
 
         if ($(this).is(":last-child")) {
           next = $(".category li:first-child");
+          nextCat = "Explore";
         } else {
           next = $(this).next();
+          nextCat = next.children(".category-title").text();
         }
 
-        var prevCat = prev.children(".category-title").text();
         var prevId = prev.attr("id");
-        var nextCat = next.children(".category-title").text();
         var nextId = next.attr("id");
 
         $(this).append("<button id='" + prevId + "' class='category-prev'>" + prevCat + "</button><button id='" + nextId + "' class='category-next'>" + nextCat + "</button>")
@@ -63,26 +71,35 @@ var $ = jQuery;
       var prevButton = $(".category-prev");
       var nextButton = $(".category-next");
 
+      var contentHeight;
       prevButton.click( function() {
         var btnId = $(this).attr("id");
+        var curSlide;
         self.$categoryItem.removeClass("visible");
         self.$categoryItem.each( function() {
           var introCat = $(this).attr("id");
           if (btnId === introCat) {
             $(this).addClass("visible");
+            curSlide = $(this);
           }
         })
+        // contentHeight = curSlide.height();
+        // $(".category").css("height", contentHeight);
       });
 
       nextButton.click( function() {
         var btnId = $(this).attr("id");
+        var curSlide;
         self.$categoryItem.removeClass("visible");
         self.$categoryItem.each( function() {
           var introCat = $(this).attr("id");
           if (btnId === introCat) {
             $(this).addClass("visible");
+            curSlide = $(this);
           }
         })
+        // contentHeight = curSlide.height();
+        // $(".category").css("height", contentHeight);
       });
     },
   };
@@ -163,6 +180,9 @@ var $ = jQuery;
               $(this).removeClass("highlighted");
               self.options.userSelection = false;
 
+              //remove underline of the category that was highlighted
+              self.$categoryList.find("li").removeClass("active");
+
             });//each
 
             setTimeout(function() {
@@ -180,6 +200,15 @@ var $ = jQuery;
 
       var catList = $(self.options.categoryList);
       var sticky = catList.offset().top;
+
+      function makeSticky() {
+        if (window.pageYOffset > sticky) {
+          catList.addClass("fixed");
+        } else {
+          catList.removeClass("fixed");
+        }
+      }
+
       var widthToDetract;
 
       if ($(window).width() < 1200) {
@@ -189,14 +218,6 @@ var $ = jQuery;
       }
 
       var startPopup = catList.offset().top - widthToDetract;
-
-      function makeSticky() {
-        if (window.pageYOffset > sticky) {
-          catList.addClass("fixed");
-        } else {
-          catList.removeClass("fixed");
-        }
-      }
 
       function initPopup() {
         if (window.pageYOffset > startPopup) {
@@ -239,6 +260,12 @@ var $ = jQuery;
             var intCategory = splitCat[0];
             var category = intCategory.replace(/,/g, '');
             var id = i+1;
+            var orgImg = data[i].image;
+            var orgImgSplit = orgImg.split("/");
+            var imageNameExt = orgImgSplit[7];
+            var imageNameExtSplit = imageNameExt.split(".");
+            var imageName = orgImgSplit[7];
+            var thumb = "/interactive/2019/12/year-in-review-2019/images/thumb/" + imageName;
 
             //push categories to array to figure out how many there are
             if (!categoryArray.includes(category)) {
@@ -246,7 +273,7 @@ var $ = jQuery;
               self.$categoryList.append("<li class='" + category + "'><span class='bullet'></span>" + fullCategory + "</li>");
             }
 
-            var storyEl = "<div class='story-frame'><div class='story-inner'><div id='story-" + id + "' class='story unclickable' data-cat='" + category + "'><div class='story-img'><img src='" + data[i].image + "' /></div><div class='story-content'><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2></div></div></div></div>";
+            var storyEl = "<div class='story-frame'><div class='story-inner'><div id='story-" + id + "' class='story unclickable' data-cat='" + category + "'><div class='story-img'><img data-org='" + data[i].image + "' src='" + thumb + "' /></div><div class='story-content'><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2></div></div></div></div>";
 
             // <p class='story-teaser'>" + data[i].teaser + "</p>
 
@@ -269,7 +296,8 @@ var $ = jQuery;
 
             for (var i = 0; i < colorArray.length; i++) {
               if (storyCat === categoryArray[i]) {
-                $(this).css("border-left", "10px solid " + colorArray[i]);
+                // $(this).css("border-left", "10px solid " + colorArray[i]);
+                $(this).prepend("<span class='story-bullet' style='background-color:" + colorArray[i] + "'></span><span class='story-category' style='color: " + colorArray[i] + "'>" + storyCat + "</span>")
               }
 
               categoryListItem.each( function() {
@@ -285,6 +313,11 @@ var $ = jQuery;
             curStory.click( function(e) {
               self.options.isPaused = true;
               self.options.userSelection = true;
+              var imageEl = $(this).find("img");
+              var thumb = imageEl.attr("src");
+              var largeImage = imageEl.attr("data-org");
+              imageEl.attr("src", largeImage);
+              imageEl.attr("data-thumb", thumb);
 
               if ($(this).hasClass("unclickable")) {
                 e.preventDefault();
@@ -312,6 +345,7 @@ var $ = jQuery;
             });
 
             //grey out all sibling with a different category when hovering over story
+            //parent is the story's wrapper $(".story-frame");
             parent.hover( function() {
 
               self.options.isPaused = true;
@@ -344,14 +378,16 @@ var $ = jQuery;
                   }
                 })
 
-                $(".category li").removeClass("visible");
-                $(".category li").each( function() {
-                  var introCat = $(this).attr("id");
-
-                  if (storyCat === introCat) {
-                    $(this).addClass("visible");
-                  }
-                })
+                // $(".category li").removeClass("visible");
+                // $(".category li").each( function() {
+                //   var introCat = $(this).attr("id");
+                //   var contentHeight = $(this).height();
+                //
+                //   if (storyCat === introCat) {
+                //     $(this).addClass("visible");
+                //     $(".category").css("height", contentHeight);
+                //   }
+                // })
                 /***** end:also highlight the category and show respective intro text *****/
               }
 
@@ -402,9 +438,11 @@ var $ = jQuery;
             $(".category li").removeClass("visible");
             $(".category li").each( function() {
               var introCat = $(this).attr("id");
+              // var contentHeight = $(this).height();
 
               if (category === introCat) {
                 $(this).addClass("visible");
+                // $(".category").css("height", contentHeight);
               }
             })
           }, function() {
@@ -444,11 +482,20 @@ var $ = jQuery;
 
       var highlightStory = $(id);
 
+      var imageEl = highlightStory.find("img");
+      var thumb = imageEl.attr("src");
+      var largeImage = imageEl.attr("data-org");
+      imageEl.attr("src", largeImage);
+      imageEl.attr("data-thumb", thumb);
+
       stories.removeClass("highlighted");
       stories.addClass("overlay");
+      //remove underline of any category that may have been active
+      self.$categoryList.find("li").removeClass("active");
 
       highlightStory.addClass("highlighted");
       highlightStory.removeClass("unclickable");
+      highlightStory.removeClass("overlay");
 
       self.animateHighlightStory(highlightStory);
 
@@ -537,17 +584,18 @@ var $ = jQuery;
 (function init () {
   $(document).ready(function() {
     $(".yir-wrapper").populateFromJSON();
+  });
 
+  $(window).on("load", function() {
     setTimeout(function() {
-      var $grid = $('.story-grid').imagesLoaded( function() {
-
-        $grid.masonry({
-          // options
-          itemSelector: '.story-frame',
-          columnWidth: '.grid-sizer',
-          percentPosition: true
-        });
-      })
+      $('.story-grid').masonry({
+        // options
+        itemSelector: '.story-frame',
+        columnWidth: '.grid-sizer',
+        percentPosition: true
+      });
+      $(".loader").hide();
     }, 500);
+
   });
 })();

@@ -42,6 +42,18 @@
 }
 
 
+@mixin bigText {
+  font-family: $body-font;
+  font-size: 16px;
+  line-height: 1.5em;
+  color: $black;
+  margin: 0 auto 40px;
+
+  @media screen and (min-width: 1024px) {
+    font-size: 19px;
+  }
+}
+
 @mixin bodyText {
   font-family: $body-font;
   font-size: 16px;
