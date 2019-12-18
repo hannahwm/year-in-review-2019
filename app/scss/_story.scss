@@ -142,17 +142,17 @@
   &.highlighted {
     position: absolute;
     width: 80vw;
-    height: 60vw;
+    height: auto;
     z-index: 9;
 
     @media screen and (min-width: 768px) {
       width: 70vw;
-      height: 50vw;
+      // height: 50vw;
     }
 
     @media screen and (min-width: 1200px) {
       width: 600px;
-      height: 400px;
+      // height: auto;
     }
 
     &:before {
@@ -216,13 +216,22 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  height: 100%;
+  // height: 100%;
   overflow: hidden;
-  margin: 0 0 -5px;
+  margin: 0 0 -10px;
   z-index: 0;
 
   .highlighted & {
     margin: 0;
+    height: 53.2vw;
+
+    @media screen and (min-width: 768px) {
+      height: 46.6vw;
+    }
+
+    @media screen and (min-width: 1200px) {
+      height: 400px;
+    }
   }
 
   img {
@@ -240,12 +249,13 @@
   overflow: hidden;
   background-color: rgba(0,0,0,0.8);
   padding: 0.5vw;
+  box-sizing: border-box;
 
   .highlighted & {
     max-height: 100%;
-    position: absolute;
+    position: relative;
     z-index: 2;
-    bottom: 0;
+    // bottom: 0;
     max-height: 50%;
     width: 100%;
   }
@@ -322,5 +332,24 @@
     @media screen and (min-width: 769px) {
       font-size: 18px;
     }
+  }
+}
+
+.story-close {
+  display: none;
+
+  .highlighted & {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 30px;
+    right: 15px;
+    border: 0;
+    text-indent: -9999px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background: url("/interactive/2019/12/year-in-review-2019/images/close-white.svg") no-repeat center;
+    outline: none;
   }
 }

@@ -131,6 +131,7 @@ var $ = jQuery;
       isPaused: true,
       isInit: false,
       userSelection: false,
+      categorySelected: false
   };
 
   Neu.populateFromJSON = {
@@ -152,51 +153,74 @@ var $ = jQuery;
     bindEvents: function() {
       var self = this;
 
+      $(window).on("load", function() {
+        setTimeout(function() {
+          $(".story-close").each(function() {
+            $(this).on("click touch", function() {
+              self.closeStory();
+            });
+          });
+        }, 500);
+
+      });
+
       $(document).ready( function() {
         self.populateFields();
         // self.categorySlider();
 
-        setInterval(function() {
-          if (self.options.isPaused === false && self.options.isInit === true) {
-            self.cycleStories();
-          }
-        }, 14000);
+        // setInterval(function() {
+        //   if (self.options.isPaused === false && self.options.isInit === true) {
+        //     self.cycleStories();
+        //   }
+        // }, 14000);
+
+        var sliderButton = $(".category button");
+
+        sliderButton.on("click", function() {
+          var category = $(this).attr("id");
+          self.options.categorySelected = true;
+
+          $(".story-categories li").each( function() {
+            if ($(this).hasClass(category)) {
+              $(this).addClass("isClicked active");
+            } else {
+              $(this).removeClass("isClicked");
+              $(this).removeClass("active");
+            }
+          });
+
+
+          self.highlightAllInCategory(category);
+        });
 
         var grid = document.getElementById("story-grid");
+        var categoryListByID = document.getElementById("category-list");
+        var slider = document.getElementById("category-slider");
 
         //close highlighted story on click outside and resume cycleStories
         document.addEventListener('click', function(event) {
           var isClickInside = grid.contains(event.target);
+          var isClickOnCategoryList = categoryListByID.contains(event.target);
+          var isClickOnSlider = slider.contains(event.target);
+
+          //clicked outside of category list
+          if (!isClickOnCategoryList && !isClickInside && !isClickOnSlider) {
+            $(".story").removeClass("inactive");
+            self.options.categorySelected = false;
+            $(".story-categories li").removeClass("isClicked active");
+          }
 
           //clicked outside
           if (!isClickInside) {
-            //close highlighted story
-            $(".highlighted").each( function() {
-
-              $(this).animate({
-                top: 0,
-                left: 0,
-              });//animate
-              $(this).removeClass("highlighted");
-              self.options.userSelection = false;
-
-              //remove underline of the category that was highlighted
-              self.$categoryList.find("li").removeClass("active");
-
-            });//each
-
-            setTimeout(function() {
-              $(".story").removeClass("overlay");
-              $(".story").not(".unclickable").addClass("unclickable");
-              self.options.isPaused = false;
-            }, 500);
+            self.closeStory();
           }//if
         });//document.addEventListener
 
       });
 
-      //make the categories fixed on scroll
-      window.onscroll = function() { makeSticky(), initPopup() };
+      /********  make the categories fixed on scroll *****/
+      // , initPopup()
+      window.onscroll = function() { makeSticky() };
 
       var catList = $(self.options.categoryList);
       var sticky = catList.offset().top;
@@ -208,24 +232,25 @@ var $ = jQuery;
           catList.removeClass("fixed");
         }
       }
+      /********  make the categories fixed on scroll *****/
 
-      var widthToDetract;
-
-      if ($(window).width() < 1200) {
-        widthToDetract = $(window).width() / 4;
-      } else {
-        widthToDetract = 300;
-      }
-
-      var startPopup = catList.offset().top - widthToDetract;
-
-      function initPopup() {
-        if (window.pageYOffset > startPopup) {
-          self.options.isInit = true;
-        } else {
-          self.options.isInit = false;
-        }
-      }
+      // var widthToDetract;
+      //
+      // if ($(window).width() < 1200) {
+      //   widthToDetract = $(window).width() / 4;
+      // } else {
+      //   widthToDetract = 300;
+      // }
+      //
+      // var startPopup = catList.offset().top - widthToDetract;
+      //
+      // function initPopup() {
+      //   if (window.pageYOffset > startPopup) {
+      //     self.options.isInit = true;
+      //   } else {
+      //     self.options.isInit = false;
+      //   }
+      // }
 
     },
     loadJSON: function(callback) {
@@ -258,14 +283,19 @@ var $ = jQuery;
             var fullCategory = data[i].category;
             var splitCat = fullCategory.split(" ");
             var intCategory = splitCat[0];
-            var category = intCategory.replace(/,/g, '');
+            var category = intCategory.replace(/'|,/g, '');
             var id = i+1;
             var orgImg = data[i].image;
             var orgImgSplit = orgImg.split("/");
             var imageNameExt = orgImgSplit[7];
-            var imageNameExtSplit = imageNameExt.split(".");
-            var imageName = orgImgSplit[7];
-            var thumb = "/interactive/2019/12/year-in-review-2019/images/thumb/" + imageName;
+            var imageName;
+            if (imageNameExt) {
+              var imageNameExtSplit = imageNameExt.split(".");
+              imageName = imageNameExtSplit[0];
+            } else {
+              imageName = "undefined";
+            }
+            var thumb = "/interactive/2019/12/year-in-review-2019/images/thumb/" + imageName + ".png";
 
             //push categories to array to figure out how many there are
             if (!categoryArray.includes(category)) {
@@ -273,14 +303,14 @@ var $ = jQuery;
               self.$categoryList.append("<li class='" + category + "'><span class='bullet'></span>" + fullCategory + "</li>");
             }
 
-            var storyEl = "<div class='story-frame'><div class='story-inner'><div id='story-" + id + "' class='story unclickable' data-cat='" + category + "'><div class='story-img'><img data-org='" + data[i].image + "' src='" + thumb + "' /></div><div class='story-content'><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2></div></div></div></div>";
+            var storyEl = "<div class='story-frame'><div class='story-inner'><div id='story-" + id + "' class='story unclickable' data-cat='" + category + "'><button class='story-close'>close</button><div class='story-img'><img data-org='" + data[i].image + "' src='" + thumb + "' /></div><div class='story-content'><h2 class='story-title'><a href='" + data[i].url + "' target='_blank'>" + data[i].title + "</a></h2></div></div></div></div>";
 
             // <p class='story-teaser'>" + data[i].teaser + "</p>
 
             self.$grid.append(storyEl);
           }
 
-          colorArray = ["#e84040","#a00000","#3c608d","#6894cb","#e2b64c","#ef945d","#69b993","#268270", "#962890"];
+          colorArray = ["#e84040","#a00000","#3c608d","#6894cb","#e2b64c","#ef945d","#69b993","#268270", "#962890", "#ef9dd3"];
 
           $(".story").each( function() {
             var curStory = $(this);
@@ -292,27 +322,38 @@ var $ = jQuery;
 
             /*******  add color border based on category *********/
             var storyCat = curStory.attr("data-cat");
+            var fullCategoryName;
             categoryListItem = self.$categoryList.find("li");
 
             for (var i = 0; i < colorArray.length; i++) {
-              if (storyCat === categoryArray[i]) {
-                // $(this).css("border-left", "10px solid " + colorArray[i]);
-                $(this).prepend("<span class='story-bullet' style='background-color:" + colorArray[i] + "'></span><span class='story-category' style='color: " + colorArray[i] + "'>" + storyCat + "</span>")
-              }
-
               categoryListItem.each( function() {
                 var listId = $(this).attr("class");
                 if ( listId === categoryArray[i]) {
                   $(this).find(".bullet").css("background-color", colorArray[i]);
+                  fullCategoryName = categoryListItem[i].innerText;
                 }
               })
+
+              if (storyCat === categoryArray[i]) {
+                // $(this).css("border-left", "10px solid " + colorArray[i]);
+                $(this).prepend("<span class='story-bullet' style='background-color:" + colorArray[i] + "'></span><span class='story-category' style='color: " + colorArray[i] + "'>" + fullCategoryName + "</span>")
+              }
+
             }
             /*******  end: add color border based on category *********/
 
             //highlight story on click
             curStory.click( function(e) {
-              self.options.isPaused = true;
+              // self.options.isPaused = true;
               self.options.userSelection = true;
+
+              //remove any category selection
+              self.options.categorySelected = false;
+              $(".story-categories li").removeClass("isClicked");
+              $(".story-categories li").removeClass("active");
+
+              $(".story").removeClass("inactive");
+
               var imageEl = $(this).find("img");
               var thumb = imageEl.attr("src");
               var largeImage = imageEl.attr("data-org");
@@ -348,18 +389,27 @@ var $ = jQuery;
             //parent is the story's wrapper $(".story-frame");
             parent.hover( function() {
 
-              self.options.isPaused = true;
-              var highlightOpen = false;
+              // self.options.isPaused = true;
+              var popupOpen = false;
+              self.options.categorySelected = false;
               var stories = $(".story");
 
               for (var i=0; i < stories.length; i++) {
                 var current = stories[i];
                 if ( $(current).hasClass("highlighted") ) {
-                  highlightOpen = true;
+                  popupOpen = true;
                 }
               }
 
-              if (highlightOpen === false) {
+              //check if the user has clicked on a category
+              for (var i=0; i < categoryListItem.length; i++) {
+                var current = categoryListItem[i];
+                if ( $(current).hasClass("isClicked") ) {
+                  self.options.categorySelected = true;
+                }
+              }
+
+              if (popupOpen === false && self.options.categorySelected === false) {
                 $(".story").not(curStory).each( function() {
                   var story = $(this);
                   var siblingCat = $(this).attr("data-cat");
@@ -396,61 +446,111 @@ var $ = jQuery;
               if (self.options.userSelection === true) {
                 $(".story").removeClass("inactive");
                 return;
+              } else if (self.options.categorySelected === true) {
+                return;
               }
 
               categoryListItem.removeClass("active");
               $(".story").removeClass("inactive");
               self.options.isPaused = false;
-              highlightOpen = false;
+              popupOpen = false;
             });
 
           });
 
           //Highlight all category items when hovering over category
           categoryListItem.hover( function() {
-            self.options.isPaused = true;
-            var highlightOpen = false;
-            var stories = $(".story");
 
-            for (var i=0; i < stories.length; i++) {
-              var current = stories[i];
-              if ( $(current).hasClass("highlighted") ) {
-                highlightOpen = true;
-              }
+            if (self.options.categorySelected === true) {
+              return;
             }
 
             var category = $(this).attr("class");
+            self.highlightAllInCategory(category);
 
-
-            if (highlightOpen === false) {
-              $(".story").each( function() {
-                var storyCat = $(this).attr("data-cat");
-                var story = $(this);
-
-                if (category !== storyCat) {
-                  story.addClass("inactive");
-                }
-              });
-            }
-
-            //display intro text for the current category
-            //make sure siblings are hidden first
-            $(".category li").removeClass("visible");
-            $(".category li").each( function() {
-              var introCat = $(this).attr("id");
-              // var contentHeight = $(this).height();
-
-              if (category === introCat) {
-                $(this).addClass("visible");
-                // $(".category").css("height", contentHeight);
-              }
-            })
           }, function() {
-            $(".story").removeClass("inactive");
-            self.options.isPaused = false;
+            if (self.options.categorySelected === false) {
+              $(".story").removeClass("inactive");
+              // self.options.isPaused = false;
+            }
           });
 
+          //Highlight all category items when clicking on category
+          categoryListItem.click( function() {
+            self.options.categorySelected = true;
+            $(".story-categories li").removeClass("isClicked");
+            $(".story-categories li").removeClass("active");
+            $(this).addClass("isClicked active");
+
+            var classNames = $(this).attr("class");
+            var category = classNames.replace(" isClicked active", "");
+            self.highlightAllInCategory(category);
+          });
       });
+
+    },
+    closeStory: function() {
+      var self = this;
+
+      //close highlighted story
+      $(".highlighted").each( function() {
+
+        $(this).animate({
+          top: 0,
+          left: 0,
+        });//animate
+        $(this).removeClass("highlighted");
+        self.options.userSelection = false;
+
+        //remove underline of the category that was highlighted
+        self.$categoryList.find("li").removeClass("active");
+
+      });//each
+
+      setTimeout(function() {
+        $(".story").removeClass("overlay");
+        $(".story").not(".unclickable").addClass("unclickable");
+      }, 500);
+    },
+    highlightAllInCategory: function(category) {
+      var self = this;
+
+      // self.options.isPaused = true;
+      var popupOpen = false;
+      var stories = $(".story");
+
+      for (var i=0; i < stories.length; i++) {
+        var current = stories[i];
+        if ( $(current).hasClass("highlighted") ) {
+          popupOpen = true;
+        }
+      }
+
+      // var category = $(this).attr("class");
+
+      if (popupOpen === false) {
+        stories.each( function() {
+          var storyCat = $(this).attr("data-cat");
+          var story = $(this);
+
+          if (category !== storyCat) {
+            story.addClass("inactive");
+          } else {
+            story.removeClass("inactive");
+          }
+        });
+      }
+
+      //display intro text for the current category
+      //make sure siblings are hidden first
+      $(".category li").removeClass("visible");
+      $(".category li").each( function() {
+        var introCat = $(this).attr("id");
+
+        if (category === introCat) {
+          $(this).addClass("visible");
+        }
+      })
 
     },
     getRandomColor: function() {
@@ -595,6 +695,8 @@ var $ = jQuery;
         percentPosition: true
       });
       $(".loader").hide();
+
+
     }, 500);
 
   });

@@ -21,27 +21,34 @@ body {
   overflow-x: hidden;
   width: 100%;
   margin: 0 0 20px;
-  padding-top: 255px;
-  background: url("/interactive/2019/12/year-in-review-2019/images/2019-banner.png") no-repeat top center #000;
+  padding-top: 220px;
+  background: url("/interactive/2019/12/year-in-review-2019/images/2019-banner-mobile.png") no-repeat top center;
+
+  &:before {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    height: 180px;
+    width: 100%;
+    content: "";
+    background-color: #e74040;
+  }
 
   @media screen and (min-width: 768px) {
-    background: url("/interactive/2019/12/year-in-review-2019/images/2019-banner-tablet.png") no-repeat top center #000;
-    padding-top: 400px;
+    background: url("/interactive/2019/12/year-in-review-2019/images/2019-banner-red-tablet.png") no-repeat top center;
+    padding-top: 350px;
+
+    &:before {
+      height: 238px;
+    }
   }
 
   @media screen and (min-width: 1028px) {
     background: url("/interactive/2019/12/year-in-review-2019/images/2019-banner-red.png") no-repeat top center;
     padding-top: 500px;
-    background-size: auto 450px;
 
     &:before {
-      position: absolute;
-      z-index: -1;
-      top: 0;
       height: 341px;
-      width: 100%;
-      content: "";
-      background-color: #e74040;
     }
   }
 }
@@ -136,6 +143,7 @@ body {
     font-weight: 300;
     text-transform: uppercase;
     border-bottom: 2px solid transparent;
+    cursor: pointer;
 
     @media screen and (min-width: 1024px) {
       height: auto;
@@ -184,4 +192,14 @@ body {
   margin: 0 auto;
   text-align: center;
   padding: 20px 0;
+}
+
+.byline {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-top: 1px solid #000;
+
+  .hp-index__tease__meta {
+    max-width: none;
+  }
 }

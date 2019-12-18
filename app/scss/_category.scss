@@ -3,7 +3,7 @@
   font-family: $body-font;
   list-style-type: none;
   max-width: 750px;
-  min-height: 495px;
+  min-height: 550px;
   // background-color: #eee;
   // border: 1px solid #e3e3e3;
   padding: 10px;
@@ -12,21 +12,25 @@
   box-sizing: border-box;
 
   @media screen and (min-width: 400px) {
-    min-height: 550px;
+    min-height: 580px;
   }
 
   @media screen and (min-width: 600px) {
-    min-height: 650px;
+    min-height: 670px;
   }
 
   @media screen and (min-width: 750px) {
-    min-height: 685px;
+    min-height: 700px;
     margin: 20px auto;
   }
 
   @media screen and (min-width: 800px) {
-    min-height: 720px;
+    // min-height: 720px;
     margin: 40px auto;
+  }
+
+  @media screen and (min-width: 1024px) {
+    min-height: 790px;
   }
 
   li {
@@ -65,6 +69,7 @@
 }
 
 .category-featTitle {
+  display: none;
   position: absolute;
   bottom: 0;
   margin: 0;
